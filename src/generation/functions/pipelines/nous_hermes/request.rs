@@ -55,7 +55,8 @@ impl NousFunctionCall {
             Ok(result) => Ok(ChatMessageResponse {
                 model: model_name.clone(),
                 created_at: "".to_string(),
-                message: Some(ChatMessage::assistant(self.format_tool_response(&result))),
+                // message: Some(ChatMessage::assistant(self.format_tool_response(&result))),
+                message: todo!(),
                 done: true,
                 final_data: None,
             }),
@@ -153,7 +154,8 @@ impl RequestParserBase for NousFunctionCall {
         ChatMessageResponse {
             model: "".to_string(),
             created_at: "".to_string(),
-            message: Some(ChatMessage::assistant(error_message)),
+            // message: Some(ChatMessage::assistant(error_message)),
+            message: todo!(),
             done: true,
             final_data: None,
         }

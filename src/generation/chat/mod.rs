@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::Ollama;
 pub mod request;
-use super::images::Image;
+use super::{functions::pipelines::meta_llama::request::LlamaFunctionCallSignature, images::Image};
 use request::ChatMessageRequest;
 
 #[cfg(feature = "chat-history")]
@@ -88,6 +88,8 @@ impl Ollama {
         }
 
         let bytes = res.bytes().await.map_err(|e| e.to_string())?;
+        // print the bytes as string
+        // println!("{:?}", std::str::from_utf8(&bytes).unwrap());
         let res =
             serde_json::from_slice::<ChatMessageResponse>(&bytes).map_err(|e| e.to_string())?;
 
@@ -230,6 +232,12 @@ pub struct ChatMessageResponse {
     #[serde(flatten)]
     /// The final data of the completion. This is only present if the completion is done.
     pub final_data: Option<ChatMessageFinalResponseData>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub enum MessageKind {
+    Unparsed(ChatMessage),
+    Parsed(Vec<LlamaFunctionCallSignature>),
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

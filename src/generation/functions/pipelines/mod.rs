@@ -2,6 +2,7 @@ use crate::error::OllamaError;
 use crate::generation::chat::{ChatMessage, ChatMessageResponse};
 use crate::generation::functions::tools::Tool;
 use async_trait::async_trait;
+use meta_llama::request::LlamaFunctionCallSignature;
 use std::sync::Arc;
 
 pub mod meta_llama;
@@ -10,6 +11,7 @@ pub mod openai;
 
 #[async_trait]
 pub trait RequestParserBase: Send + Sync {
+
     async fn parse(
         &self,
         input: &str,

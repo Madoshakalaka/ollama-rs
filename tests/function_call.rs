@@ -38,7 +38,8 @@ async fn test_send_function_call() {
         .await
         .unwrap();
 
-    assert!(result.done);
+    todo!();
+    // assert!(result.done);
 }
 
 #[tokio::test]
@@ -96,7 +97,8 @@ async fn test_send_function_call_finance() {
         .await
         .unwrap();
 
-    assert!(result.done);
+    todo!();
+    // assert!(result.done);
 }
 
 #[tokio::test]
@@ -122,7 +124,8 @@ async fn test_send_function_call_llama() {
         .await
         .unwrap();
 
-    assert!(result.done);
+    todo!();
+    // assert!(result.done);
 }
 
 #[tokio::test]
@@ -148,5 +151,6 @@ async fn test_send_function_call_phi3_medium() {
         .await
         .unwrap();
 
-    assert!(result.done);
+    // assert!(result.done);
+    todo!();
 }

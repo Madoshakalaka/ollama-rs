@@ -33,17 +33,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
             .await?;
 
-        let mut response = String::new();
-        while let Some(Ok(res)) = stream.next().await {
-            if let Some(assistant_message) = res.message {
-                stdout
-                    .write_all(assistant_message.content.as_bytes())
-                    .await?;
-                stdout.flush().await?;
-                response += assistant_message.content.as_str();
-            }
-        }
-        dbg!(&ollama.get_messages_history("user"));
+        todo!("fix the test case");
+        // let mut response = String::new();
+        // while let Some(Ok(res)) = stream.next().await {
+        //     if let Some(assistant_message) = res.message {
+        //         stdout
+        //             .write_all(assistant_message.content.as_bytes())
+        //             .await?;
+        //         stdout.flush().await?;
+        //         response += assistant_message.content.as_str();
+        //     }
+        // }
+        // dbg!(&ollama.get_messages_history("user"));
     }
 
     Ok(())

@@ -6,6 +6,8 @@ pub use crate::generation::functions::pipelines::meta_llama::request::LlamaFunct
 pub use crate::generation::functions::pipelines::nous_hermes::request::NousFunctionCall;
 pub use crate::generation::functions::pipelines::openai::request::OpenAIFunctionCall;
 pub use crate::generation::functions::request::FunctionCallRequest;
+use pipelines::meta_llama::request::LlamaFunctionCallSignature;
+use regex::Regex;
 pub use tools::Browserless;
 pub use tools::DDGSearcher;
 pub use tools::Scraper;
@@ -68,23 +70,24 @@ impl crate::Ollama {
             )
             .await;
 
-        match result {
-            Ok(r) => {
-                self.add_assistant_response(id.clone(), r.message.clone().unwrap().content);
-                Ok(r)
-            }
-            Err(e) => {
-                self.add_assistant_response(id.clone(), e.message.clone().unwrap().content);
-                Err(OllamaError::from(e.message.unwrap().content))
-            }
-        }
+        todo!("need to read about the ollama history API")
+        // match result {
+        //     Ok(r) => {
+        //         self.add_assistant_response(id.clone(), r.message.clone().unwrap().content);
+        //         Ok(r)
+        //     }
+        //     Err(e) => {
+        //         self.add_assistant_response(id.clone(), e.message.clone().unwrap().content);
+        //         Err(OllamaError::from(e.message.unwrap().content))
+        //     }
+        // }
     }
 
     pub async fn send_function_call(
         &self,
         request: FunctionCallRequest,
         parser: Arc<dyn RequestParserBase>,
-    ) -> Result<ChatMessageResponse, OllamaError> {
+    ) -> Result<Vec<LlamaFunctionCallSignature>, OllamaError> {
         let mut request = request;
 
         request.chat.stream = false;
@@ -98,12 +101,81 @@ impl crate::Ollama {
         let result = self.send_chat_messages(request.chat).await?;
         let response_content: String = result.message.clone().unwrap().content;
 
-        let result = parser
-            .parse(&response_content, model_name, request.tools)
-            .await;
-        match result {
-            Ok(r) => Ok(r),
-            Err(e) => Err(OllamaError::from(e.message.unwrap().content)),
+        // let result = parser
+        //     .parse(&response_content, model_name, request.tools)
+        //     .await;
+        let result = parse_llama_function(&response_content, model_name, request.tools);
+        Ok(result)
+
+        // match result {
+        //     Ok(r) => Ok(r),
+        //     // Err(e) => Err(OllamaError::from(e.message.unwrap().content)),
+        //     Err(e) => Err(OllamaError::from("parse error happened".to_string())),
+        // }
+    }
+}
+
+fn parse_llama_tool_response(response: &str) -> Option<Vec<LlamaFunctionCallSignature>> {
+    let function_regex = Regex::new(r"<function=(\w+)>(.*?)</function>").unwrap();
+    println!("Response: {}", response);
+
+    let mut signatures = Vec::new();
+
+    for caps in function_regex.captures_iter(response) {
+        let function_name = caps.get(1).unwrap().as_str().to_string();
+        let args_string = caps.get(2).unwrap().as_str();
+
+        match serde_json::from_str(args_string) {
+            Ok(arguments) => {
+                signatures.push(LlamaFunctionCallSignature {
+                    function: function_name,
+                    arguments,
+                });
+            }
+            Err(error) => {
+                println!("Error parsing function arguments: {}", error);
+                // todo:
+            }
+        }
+    }
+
+    if signatures.is_empty() {
+        None
+    } else {
+        Some(signatures)
+    }
+}
+
+fn parse_llama_function(
+    input: &str,
+    model_name: String,
+    tools: Vec<Arc<dyn Tool>>,
+) -> Vec<LlamaFunctionCallSignature> {
+    // let response_value = self.parse_tool_response(&self.clean_tool_call(input));
+    let response_value = parse_llama_tool_response(input);
+    match response_value {
+        Some(response) => {
+            // todo: get the return value from the function call
+            response
+            // if let Some(tool) = tools.iter().find(|t| t.name() == response.function) {
+            //     let tool_params = response.arguments;
+            //     let result = self
+            //         .function_call_with_history(
+            //             model_name.clone(),
+            //             tool_params.clone(),
+            //             tool.clone(),
+            //         )
+            //         .await?;
+            //     return Ok(result);
+            // } else {
+            //     return Err(self.error_handler(OllamaError::from("Tool not found".to_string())));
+            // }
+        }
+        None => {
+            panic!("Error parsing function call");
+            // return Err(
+            //     self.error_handler(OllamaError::from("Error parsing function call".to_string()))
+            // );
         }
     }
 }

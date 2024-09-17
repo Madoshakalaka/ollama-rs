@@ -31,9 +31,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
             .await?;
 
-        let assistant_message = result.message.unwrap().content;
-        stdout.write_all(assistant_message.as_bytes()).await?;
-        stdout.flush().await?;
+        todo!("fix the test case");
+        // let assistant_message = result.message.unwrap().content;
+        // stdout.write_all(assistant_message.as_bytes()).await?;
+        // stdout.flush().await?;
     }
 
     // Display whole history of messages

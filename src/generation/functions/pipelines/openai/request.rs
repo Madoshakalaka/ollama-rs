@@ -44,7 +44,8 @@ impl OpenAIFunctionCall {
             Ok(result) => Ok(ChatMessageResponse {
                 model: model_name.clone(),
                 created_at: "".to_string(),
-                message: Some(ChatMessage::assistant(result.to_string())),
+                // message: Some(ChatMessage::assistant(result.to_string())),
+                message: todo!(),
                 done: true,
                 final_data: None,
             }),
@@ -105,7 +106,8 @@ impl RequestParserBase for OpenAIFunctionCall {
         ChatMessageResponse {
             model: "".to_string(),
             created_at: "".to_string(),
-            message: Some(ChatMessage::assistant(error.to_string())),
+            // message: Some(ChatMessage::assistant(error.to_string())),
+            message: todo!(),
             done: true,
             final_data: None,
         }

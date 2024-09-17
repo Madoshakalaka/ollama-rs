@@ -35,17 +35,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ))
             .await?;
 
+        todo!("is this a test case? need to fix");
         let mut response = String::new();
-        while let Some(Ok(res)) = stream.next().await {
-            if let Some(assistant_message) = res.message {
-                stdout
-                    .write_all(assistant_message.content.as_bytes())
-                    .await?;
-                stdout.flush().await?;
-                response += assistant_message.content.as_str();
-            }
-        }
-        messages.push(ChatMessage::assistant(response));
+        // while let Some(Ok(res)) = stream.next().await {
+        //     if let Some(assistant_message) = res.message {
+        //         stdout
+        //             .write_all(assistant_message.content.as_bytes())
+        //             .await?;
+        //         stdout.flush().await?;
+        //         response += assistant_message.content.as_str();
+        //     }
+        // }
+        // messages.push(ChatMessage::assistant(response));
     }
 
     Ok(())
